@@ -1,0 +1,371 @@
+<html><head><base href="https://swiftsmp.net/"><title>SwiftSMP Minecraft Server Status</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+    :root {
+        --bg-color: #1a1a2e;
+        --text-color: #e0e0e0;
+        --primary-color: #8a2be2;
+        --secondary-color: #4a0e78;
+        --accent-color: #c39bd3;
+    }
+    body {
+        font-family: 'Poppins', Arial, sans-serif;
+        background: linear-gradient(135deg, var(--bg-color) 0%, #2a2a4e 100%);
+        color: var(--text-color);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+    .container {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 30px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(138, 43, 226, 0.2);
+        max-width: 400px;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+        margin-top: 80px;
+    }
+    h1 {
+        color: var(--primary-color);
+        font-size: 28px;
+        margin-bottom: 20px;
+        text-shadow: 1px 1px 2px rgba(138, 43, 226, 0.3);
+    }
+    .status {
+        font-size: 22px;
+        margin: 20px 0;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+    .online {
+        color: #4caf50;
+    }
+    .offline {
+        color: #f44336;
+    }
+    .player-count {
+        font-size: 18px;
+        color: var(--accent-color);
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+    }
+    #playerList {
+        list-style-type: none;
+        padding: 0;
+        max-height: 200px;
+        overflow-y: auto;
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        padding: 10px;
+    }
+    #playerList li {
+        margin: 8px 0;
+        color: var(--text-color);
+        transition: all 0.3s ease;
+        opacity: 0;
+        transform: translateX(-20px);
+        animation: slideIn 0.5s forwards;
+    }
+    #playerList li:hover {
+        transform: translateX(5px);
+        color: var(--primary-color);
+    }
+    @keyframes slideIn {
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+    .player-join {
+        animation: pulse 0.5s;
+    }
+    .player-leave {
+        animation: pulse 0.5s;
+    }
+    .server-address {
+        font-size: 16px;
+        color: var(--primary-color);
+        margin-top: 15px;
+        font-weight: 600;
+    }
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: rgba(26, 26, 46, 0.9);
+        padding: 10px 20px;
+        box-sizing: border-box;
+        z-index: 1000;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .menu-toggle {
+        background: none;
+        border: none;
+        font-size: 24px;
+        color: var(--primary-color);
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        display: none;
+    }
+    .menu-toggle:hover {
+        transform: scale(1.1);
+    }
+    .nav-menu {
+        display: flex;
+        align-items: center;
+    }
+    .nav-menu ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+    }
+    .nav-menu li {
+        margin: 0 15px;
+    }
+    .nav-menu a {
+        text-decoration: none;
+        color: var(--text-color);
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    .nav-menu a::after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -5px;
+        left: 0;
+        background-color: var(--primary-color);
+        transition: width 0.3s ease;
+    }
+    .nav-menu a:hover::after {
+        width: 100%;
+    }
+    .nav-menu a:hover {
+        color: var(--primary-color);
+    }
+    .nav-menu img {
+        width: 20px;
+        height: 20px;
+        margin-right: 8px;
+        filter: invert(1);
+    }
+    .footer {
+        text-align: center;
+        padding: 20px;
+        width: 100%;
+        background-color: rgba(26, 26, 46, 0.9);
+        margin-top: 30px;
+    }
+    .footer a {
+        color: var(--primary-color);
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    .footer a:hover {
+        color: var(--accent-color);
+    }
+    @media (max-width: 768px) {
+        .menu-toggle {
+            display: block;
+        }
+        .nav-menu {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 250px;
+            height: 100vh;
+            background-color: rgba(26, 26, 46, 0.95);
+            flex-direction: column;
+            justify-content: flex-start;
+            padding-top: 60px;
+            transition: left 0.3s ease;
+        }
+        .nav-menu.active {
+            left: 0;
+        }
+        .nav-menu ul {
+            flex-direction: column;
+        }
+        .nav-menu li {
+            margin: 20px 0;
+        }
+        .close-menu {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+    }
+</style>
+</head>
+<body>
+<nav class="navbar">
+    <button class="menu-toggle" id="menuToggle">☰</button>
+    <div class="nav-menu" id="navMenu">
+        <button class="close-menu" id="closeMenu">×</button>
+        <ul>
+            <li>
+                <a href="https://discord.gg/swiftsmp" target="_blank">
+                    <img src="https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/discord.svg" alt="Discord logo">
+                    Discord
+                </a>
+            </li>
+            <li>
+                <a href="https://swiftsmp.tabex.io/" target="_blank">
+                    <img src="https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/shopify.svg" alt="Store logo">
+                    Store
+                </a>
+            </li>
+            <li>
+                <a href="#about">
+                    <img src="https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/aboutdotme.svg" alt="About logo">
+                    About
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+    <h1>SwiftSMP Minecraft Server</h1>
+    <div id="serverStatus" class="status">Checking server status...</div>
+    <div id="playerCount" class="player-count">Players online: --</div>
+    <ul id="playerList"></ul>
+    <div class="server-address">swiftsmp.net</div>
+</div>
+
+<footer class="footer">
+    <p><a href="#privacy">Privacy Policy</a></p>
+    <p>© <span id="currentYear"></span> SwiftSMP. All rights reserved.</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+    const serverIP = 'swiftsmp.net';
+    const apiUrl = `https://api.mcsrvstat.us/2/${serverIP}`;
+    let previousPlayerCount = 0;
+    let playerList = [];
+
+    function updateServerStatus() {
+        $.getJSON(apiUrl, function(data) {
+            const statusElement = $('#serverStatus');
+            const playerCountElement = $('#playerCount');
+            const playerListElement = $('#playerList');
+
+            if (data.online) {
+                statusElement.text('Server Status: Online').addClass('online').removeClass('offline');
+                
+                const currentPlayerCount = data.players.online;
+                playerCountElement.text(`Players online: ${currentPlayerCount}/${data.players.max}`);
+
+                if (currentPlayerCount > previousPlayerCount) {
+                    playerCountElement.addClass('player-join');
+                    setTimeout(() => playerCountElement.removeClass('player-join'), 500);
+                } else if (currentPlayerCount < previousPlayerCount) {
+                    playerCountElement.addClass('player-leave');
+                    setTimeout(() => playerCountElement.removeClass('player-leave'), 500);
+                }
+
+                previousPlayerCount = currentPlayerCount;
+
+                playerListElement.empty();
+                if (data.players.list && data.players.list.length > 0) {
+                    const newPlayerList = data.players.list;
+                    newPlayerList.forEach((player, index) => {
+                        const li = $(`<li>${player}</li>`);
+                        playerListElement.append(li);
+                        if (!playerList.includes(player)) {
+                            li.css('animation-delay', `${index * 100}ms`);
+                        }
+                    });
+                    playerList = newPlayerList;
+                } else {
+                    playerListElement.append('<li>swiftsmp.net</li>');
+                }
+            } else {
+                statusElement.text('Server Status: Offline').addClass('offline').removeClass('online');
+                playerCountElement.text('Players online: 0');
+                playerListElement.empty().append('<li>Server is offline</li>');
+                previousPlayerCount = 0;
+                playerList = [];
+            }
+        }).fail(function() {
+            $('#serverStatus').text('Error fetching server status').addClass('offline').removeClass('online');
+            $('#playerCount').text('Players online: --');
+            $('#playerList').empty().append('<li>Unable to retrieve player data</li>');
+        });
+    }
+
+    // Update status initially and every 10 seconds
+    updateServerStatus();
+    setInterval(updateServerStatus, 10000);
+
+    // Add smooth fade-in animation
+    $(document).ready(function() {
+        $('.container').hide().fadeIn(1000);
+    });
+
+    // Navbar functionality
+    const menuToggle = document.getElementById('menuToggle');
+    const navMenu = document.getElementById('navMenu');
+    const closeMenu = document.getElementById('closeMenu');
+
+    menuToggle.addEventListener('click', () => {
+        navMenu.classList.add('active');
+    });
+
+    closeMenu.addEventListener('click', () => {
+        navMenu.classList.remove('active');
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (event) => {
+        if (!navMenu.contains(event.target) && event.target !== menuToggle) {
+            navMenu.classList.remove('active');
+        }
+    });
+
+    // Close menu when window is resized to desktop view
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            navMenu.classList.remove('active');
+        }
+    });
+
+    // Update copyright year
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+</script>
+</body></html>
